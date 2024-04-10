@@ -1,5 +1,4 @@
 from argparse import ArgumentParser, HelpFormatter, Namespace
-from datetime import datetime
 from operator import attrgetter
 
 
@@ -42,6 +41,24 @@ def mainArgs() -> Namespace:
         type=str,
         choices=["github"],
         default="github",
+    )
+
+    # Args with defaults
+    parser.add_argument(
+        "--popularity",
+        help="Metric to determine popularity",
+        type=str,
+        required=False,
+        choices=["stars", "forks"],
+        default="stars",
+    )
+    parser.add_argument(
+        "--order",
+        help="Order to present results. NOTE: Might cut off results if limit on search query",
+        type=str,
+        required=False,
+        choices=["asc", "desc"],
+        default="desc",
     )
 
     # Repo language, has default value that can limit the search results
@@ -115,36 +132,6 @@ def mainArgs() -> Namespace:
         type=int,
         required=False,
         default=MAX_VALUE,
-    )
-
-    # Repo creation/ updated
-    parser.add_argument(
-        "--min-created-date",
-        help="Minimum date of creation a repository must have",
-        type=str,
-        required=False,
-        default="1970-01-01",
-    )
-    parser.add_argument(
-        "--max-created-date",
-        help="Maximum date of creation a repository must have",
-        type=str,
-        required=False,
-        default=datetime.now().strftime("%Y-%m-%d"),
-    )
-    parser.add_argument(
-        "--min-pushed-date",
-        help="Minimum date of the latest push a repository must have",
-        type=str,
-        required=False,
-        default="1970-01-01",
-    )
-    parser.add_argument(
-        "--max-pushed-date",
-        help="Maximum date of the latest push a repository must have",
-        type=str,
-        required=False,
-        default=datetime.now().strftime("%Y-%m-%d"),
     )
 
     return parser.parse_args()

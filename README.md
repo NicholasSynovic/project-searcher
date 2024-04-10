@@ -3,7 +3,8 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6480691.svg)](https://doi.org/10.5281/zenodo.6480691)
 [![Release Project](https://github.com/SoftwareSystemsLaboratory/prime-github-repository-searcher/actions/workflows/release.yml/badge.svg)](https://github.com/SoftwareSystemsLaboratory/prime-github-repository-searcher/actions/workflows/release.yml)
 
-> A utility to perform advanced searching on GitHub using both the REST and GraphQL APIs
+> A utility to perform advanced searching on GitHub using both the REST and
+> GraphQL APIs
 
 ## Table of Contents
 
@@ -17,11 +18,14 @@
 
 ## About
 
-The Software Systems Laboratory (SSL) GitHub Repository Searcher is an installable Python project that utilizes both the GitHub REST and GraphQL APIs to allow for the advanced searching of repositories hosted on GitHub.
+The Software Systems Laboratory (SSL) GitHub Repository Searcher is an
+installable Python project that utilizes both the GitHub REST and GraphQL APIs
+to allow for the advanced searching of repositories hosted on GitHub.
 
 ### Licensing
 
-This project is licensed under the BSD-3-Clause. See the [LICENSE](LICENSE) for more information.
+This project is licensed under the BSD-3-Clause. See the [LICENSE](LICENSE) for
+more information.
 
 ## How To Use
 
@@ -36,7 +40,7 @@ You can install the tool from PyPi with one of the following one liners:
 
 `prime-github-repository-searcher -h`
 
-``` shell
+```shell
 usage: PRIME GitHub Repository Searcher [-h] [-r REPOSITORY] [--topic TOPIC]
                                         -o OUTPUT -t TOKEN
                                         [--min-stars MIN_STARS]
