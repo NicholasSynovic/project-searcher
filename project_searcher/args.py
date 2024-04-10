@@ -156,12 +156,4 @@ def mainArgs() -> Namespace:
         required=False,
         default=datetime.now().strftime("%Y-%m-%d"),
     )
-    parser.add_argument(
-        "-v",
-        "--version",
-        help="Display version of the tool",
-        action="store_true",
-        default=False,
-    )
-
     return parser.parse_args()
