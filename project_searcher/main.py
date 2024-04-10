@@ -1,11 +1,10 @@
 from argparse import Namespace
 
 from pandas import DataFrame
-from progress.bar import Bar
-from requests import Response, get, post
-
 from prime_repository_searcher.args import mainArgs
 from prime_repository_searcher.version import version
+from progress.bar import Bar
+from requests import Response, get, post
 
 
 def callREST(
@@ -103,7 +102,6 @@ def analyzeJSON(
     minWatchers: int,
     maxWatchers: int,
 ) -> DataFrame:
-
     root: dict = json["data"]["repository"]
 
     data: list = [
