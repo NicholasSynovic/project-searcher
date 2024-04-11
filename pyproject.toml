@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.10"
 requests = "^2.31.0"
 progress = "^1.6"
+ghah = {git = "https://github.com/NicholasSynovic/github-api-handler"}
 
 
 [build-system]

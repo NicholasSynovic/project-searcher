@@ -1,76 +1,155 @@
 from argparse import Namespace
 from string import Template
-from typing import List
+from time import sleep, time
+from typing import List, Tuple
 
-from requests import Response, get
+from ghah.main import GH_REST
+from progress.bar import Bar
+from requests import Response
 
 from project_searcher.args import mainArgs
-
-GITHUB_HEADERS: dict[str, str] = {
-    "Accept": "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
-    "User-Agent": "prime-vX",
-}
 
 GITHUB_URL: Template = Template(
     template="https://api.github.com/search/repositories?q=size:${minSize}..${maxSize}+followers:${minFollowers}..${maxFollowers}+forks:${minForks}..${maxForks}+stars:${minStars}..${maxStars}&sort=${popularity}&order=${order}&per_page=100&page=${page}"
 )
 
-
-def getResponse(url: str, headers: dict) -> Response | None:
-    resp: Response = get(url=url, headers=headers)
-
-    if resp.status_code == 200:
-        return resp
-    else:
-        return None
+DEFAULT_MESSAGE: str = "Conducting search..."
+SLEEP_MESSAGE: str = "Sleeping for 60 seconds to avoid rate limit..."
 
 
-def githubSearch(args: Namespace, headers: dict[str, str]) -> None:
-    page: int = 0
+def githubSearch(args: Namespace) -> List[dict]:
+    data: List[dict] = []
 
-    while True:
-        page += 1
+    maxPage: int = 10
+    totalTime: float = 0.0
 
-        url: str = GITHUB_URL.substitute(
-            minSize=args.min_size,
-            maxSize=args.max_size,
-            minFollowers=args.min_followers,
-            maxFollowers=args.max_followers,
-            minForks=args.min_forks,
-            maxForks=args.max_forks,
-            minStars=args.min_stars,
-            maxStars=args.max_stars,
-            popularity=args.popularity,
-            order=args.order,
-            page=page,
-        )
+    reqHeaders: dict[str, str] = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "prime-vX",
+        "Authorization": f"Bearer {args.token}",
+    }
 
-        resp: Response | None = getResponse(url=url, headers=headers)
+    with Bar("Conducting search...", max=10) as bar:
+        page: int
+        for page in range(1, 11):
+            # Handler for if the total time between API calls >= 15 seconds
+            if totalTime >= 15:
+                bar.message = SLEEP_MESSAGE
+                bar.update()
+                sleep(60)
+                totalTime = 0.0
+                bar.message = DEFAULT_MESSAGE
+                bar.update()
 
-        if resp is None:
-            quit(1)
+            # Start time of the call
+            startTime: float = time()
 
-        json: dict = resp.json()
-        items: List[dict] = json["items"]
+            url: str = GITHUB_URL.substitute(
+                minSize=args.min_size,
+                maxSize=args.max_size,
+                minFollowers=args.min_followers,
+                maxFollowers=args.max_followers,
+                minForks=args.min_forks,
+                maxForks=args.max_forks,
+                minStars=args.min_stars,
+                maxStars=args.max_stars,
+                popularity=args.popularity,
+                order=args.order,
+                page=page,
+            )
 
-        item: dict
-        for item in items:
-            print(item["full_name"])
+            # API handler
+            gh: GH_REST = GH_REST(endpoint=url, reqHeaders=reqHeaders)
+            resp: Tuple[Response, dict] = gh.get()
+            # End time of the call
+            endTime: float = time()
+
+            # Total time it took for the call
+            totalTime += endTime - startTime
+
+            # Last page availible via pagination
+            # NOTE: Only 1000 results are availible at a time. With 100 results
+            # per page, that means that 1000 / 100 = 10 pages maximum returned
+            lastPage: int = resp[1]["Last-Page"]
+            maxPage = lastPage if (lastPage > 0) and (lastPage <= 10) else 10
+            bar.max = maxPage
+            bar.update()
+
+            data.extend(resp[0].json()["items"])
+
+            bar.next()
+
+    return data
+
+    # responseTime: float = 0.0
+    # currentTime: float = time()
+    # txtFile: TextIOWrapper = open(file=args.output, mode="w")
+
+    # with Bar("Extracting repos from search...", max=10) as bar:
+    #     page: int = 0
+
+    #     while True:
+    #         page += 1
+
+    # url: str = GITHUB_URL.substitute(
+    #     minSize=args.min_size,
+    #     maxSize=args.max_size,
+    #     minFollowers=args.min_followers,
+    #     maxFollowers=args.max_followers,
+    #     minForks=args.min_forks,
+    #     maxForks=args.max_forks,
+    #     minStars=args.min_stars,
+    #     maxStars=args.max_stars,
+    #     popularity=args.popularity,
+    #     order=args.order,
+    #     page=page,
+    # )
+    # txtFile.write("=== " + url + " ===\n")
+
+    #         if responseTime > 15:
+    #             bar.message = "Sleeping for one minute to avoid secondary rate limit..."
+    #             bar.update()
+    #             sleep(60)
+    #             responseTime = 0
+
+    #         resp: Response | None = getResponse(url=url, headers=headers)
+    #         responseTime += time() - currentTime
+    #         print(f" {responseTime}")
+
+    #         if resp is None:
+    #             txtFile.close()
+    #             quit(1)
+
+    #         json: dict = resp.json()
+    #         items: List[dict] = json["items"]
+
+    #         item: dict
+    #         for item in items:
+    #             repo: str = item["full_name"]
+    #             txtFile.write(repo +"\n")
+
+    #         bar.next()
+    #         currentTime = time()
 
 
 def main() -> None:
     args: Namespace = mainArgs()
 
-    headers: dict
+    data: List[dict]
     match args.platform:
         case "github":
-            headers = GITHUB_HEADERS
-            headers["Authorization"] = f"Bearer {args.token}"
-            githubSearch(args=args, headers=headers)
+            data: List[dict] = githubSearch(args=args)
         case _:
             print("Invalid platform")
             quit(1)
+
+    with open(file=args.output, mode="w") as txtFile:
+        datum: dict
+        for datum in data:
+            name: str = datum["full_name"]
+            txtFile.write(f"{name}\n")
+        txtFile.close()
 
 
 if __name__ == "__main__":

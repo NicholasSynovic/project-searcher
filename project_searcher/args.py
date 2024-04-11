@@ -53,6 +53,14 @@ def mainArgs() -> Namespace:
         default="stars",
     )
     parser.add_argument(
+        "-o",
+        "--output",
+        help="Text file to store output",
+        type=str,
+        required=False,
+        default="search.txt",
+    )
+    parser.add_argument(
         "--order",
         help="Order to present results. NOTE: Might cut off results if limit on search query",
         type=str,
