@@ -82,56 +82,6 @@ def githubSearch(args: Namespace) -> List[dict]:
 
     return data
 
-    # responseTime: float = 0.0
-    # currentTime: float = time()
-    # txtFile: TextIOWrapper = open(file=args.output, mode="w")
-
-    # with Bar("Extracting repos from search...", max=10) as bar:
-    #     page: int = 0
-
-    #     while True:
-    #         page += 1
-
-    # url: str = GITHUB_URL.substitute(
-    #     minSize=args.min_size,
-    #     maxSize=args.max_size,
-    #     minFollowers=args.min_followers,
-    #     maxFollowers=args.max_followers,
-    #     minForks=args.min_forks,
-    #     maxForks=args.max_forks,
-    #     minStars=args.min_stars,
-    #     maxStars=args.max_stars,
-    #     popularity=args.popularity,
-    #     order=args.order,
-    #     page=page,
-    # )
-    # txtFile.write("=== " + url + " ===\n")
-
-    #         if responseTime > 15:
-    #             bar.message = "Sleeping for one minute to avoid secondary rate limit..."
-    #             bar.update()
-    #             sleep(60)
-    #             responseTime = 0
-
-    #         resp: Response | None = getResponse(url=url, headers=headers)
-    #         responseTime += time() - currentTime
-    #         print(f" {responseTime}")
-
-    #         if resp is None:
-    #             txtFile.close()
-    #             quit(1)
-
-    #         json: dict = resp.json()
-    #         items: List[dict] = json["items"]
-
-    #         item: dict
-    #         for item in items:
-    #             repo: str = item["full_name"]
-    #             txtFile.write(repo +"\n")
-
-    #         bar.next()
-    #         currentTime = time()
-
 
 def main() -> None:
     args: Namespace = mainArgs()
