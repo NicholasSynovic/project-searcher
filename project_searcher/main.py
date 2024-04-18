@@ -101,6 +101,14 @@ def main() -> None:
             txtFile.write(f"{name}\n")
         txtFile.close()
 
+    if args.git_clone:
+        with open(file=args.output + ".git", mode="w") as txtFile:
+            datum: dict
+            for datum in data:
+                name: str = datum["full_name"]
+                txtFile.write(f"git clone https://github.com/{name} {name}\n")
+            txtFile.close()
+
 
 if __name__ == "__main__":
     main()

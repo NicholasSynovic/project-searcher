@@ -26,6 +26,15 @@ def mainArgs() -> Namespace:
         formatter_class=SortingHelpFormatter,
     )
 
+    # Flags
+    parser.add_argument(
+        "--git-clone",
+        help="Flag to return git clone commands in a text file along with standard output",
+        required=False,
+        default=False,
+        action="store_true",
+    )
+
     # Required args
     parser.add_argument(
         "-t",
